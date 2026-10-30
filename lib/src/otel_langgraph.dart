@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_langgraph_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_langgraph';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class LanggraphResult {
+  /// Creates a result.
   const LanggraphResult({
     this.assistantId,
     this.threadId,
@@ -86,8 +87,13 @@ class LanggraphResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class LanggraphCallResult<T> {
+  /// Creates a call result.
   const LanggraphCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final LanggraphResult? result;
 }
@@ -114,74 +120,74 @@ Future<T> tracedLanggraph<T>({
   final span = _tracer().startSpan(
     'langgraph $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.assistantId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.assistant.id',
           r.result!.assistantId!,
         ));
       }
       if (r.result!.threadId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.thread.id',
           r.result!.threadId!,
         ));
       }
       if (r.result!.runId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.run.id',
           r.result!.runId!,
         ));
       }
       if (r.result!.graphId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.graph.id',
           r.result!.graphId!,
         ));
       }
       if (r.result!.checkpointId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.checkpoint.id',
           r.result!.checkpointId!,
         ));
       }
       if (r.result!.checkpointNs != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.checkpoint.ns',
           r.result!.checkpointNs!,
         ));
       }
       if (r.result!.parentCheckpointId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.checkpoint.parent_id',
           r.result!.parentCheckpointId!,
         ));
       }
       if (r.result!.nodeName != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.node.name',
           r.result!.nodeName!,
         ));
       }
       if (r.result!.edgeTo != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.edge.to',
           r.result!.edgeTo!,
         ));
       }
       if (r.result!.streamMode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.stream.mode',
           r.result!.streamMode!,
         ));
       }
       if (r.result!.runStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.run.status',
           r.result!.runStatus!,
         ));
@@ -194,25 +200,25 @@ Future<T> tracedLanggraph<T>({
         }
       }
       if (r.result!.interrupted != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'langgraph.interrupted',
           r.result!.interrupted!,
         ));
       }
       if (r.result!.interruptReason != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.interrupt.reason',
           r.result!.interruptReason!,
         ));
       }
       if (r.result!.stepCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'langgraph.step.count',
           r.result!.stepCount!,
         ));
       }
       if (r.result!.recursionLimit != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'langgraph.recursion.limit',
           r.result!.recursionLimit!,
         ));
@@ -225,19 +231,19 @@ Future<T> tracedLanggraph<T>({
         }
       }
       if (r.result!.statePatchKeys != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.state.patch_keys',
           r.result!.statePatchKeys!,
         ));
       }
       if (r.result!.deploymentRevision != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'langgraph.deployment.revision',
           r.result!.deploymentRevision!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -248,13 +254,13 @@ Future<T> tracedLanggraph<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
